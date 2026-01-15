@@ -1,9 +1,11 @@
 package com.tech.domain.di
 
+import com.tech.data.local.dataSource.BXMasLocalDataSource
 import com.tech.data.remote.dataSource.BXMasRemoteDataSource
 import com.tech.domain.repository.BXMasRepository
 import com.tech.domain.repository.BXMasRepositoryImpl
-import com.tech.domain.useCase.GetPhotosUseCase
+import com.tech.domain.useCase.GetPagedPhotosUseCase
+import com.tech.domain.useCase.SyncPhotosUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,14 +20,21 @@ object DomainModule {
     @Singleton
     fun provideBXMasRepository(
         bxMasRemoteDataSource: BXMasRemoteDataSource,
-    ): BXMasRepository = BXMasRepositoryImpl(bxMasRemoteDataSource)
+        bxMasLocalDataSource: BXMasLocalDataSource,
+    ): BXMasRepository = BXMasRepositoryImpl(bxMasRemoteDataSource, bxMasLocalDataSource)
 
 
     @Provides
     @Singleton
     fun provideGetPhotosUseCase(
         bxMasRepository: BXMasRepository,
-    ): GetPhotosUseCase = GetPhotosUseCase(bxMasRepository)
+    ): GetPagedPhotosUseCase = GetPagedPhotosUseCase(bxMasRepository)
+
+    @Provides
+    @Singleton
+    fun provideSyncPhotosUseCase(
+        bxMasRepository: BXMasRepository,
+    ): SyncPhotosUseCase = SyncPhotosUseCase(bxMasRepository)
 
 
 }

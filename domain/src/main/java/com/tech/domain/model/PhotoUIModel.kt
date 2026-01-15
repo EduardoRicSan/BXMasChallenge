@@ -1,5 +1,6 @@
 package com.tech.domain.model
 
+import com.tech.data.local.entity.PhotoEntity
 import com.tech.data.remote.dto.PhotoDTO
 
 
@@ -12,6 +13,14 @@ data class PhotoUIModel(
 )
 
 fun PhotoDTO.toPhoto(): PhotoUIModel = PhotoUIModel(
+    albumId = albumId,
+    id = id,
+    title = title,
+    url = url,
+    thumbnailUrl = thumbnailUrl
+)
+
+fun PhotoEntity.toUI() = PhotoUIModel(
     albumId = albumId,
     id = id,
     title = title,

@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import com.tech.data.BuildConfig
+import com.tech.data.local.dataSource.BXMasLocalDataSource
 import com.tech.data.remote.api.BXMasApiService
 import com.tech.data.remote.api.BXMasApiServiceImpl
 import com.tech.data.remote.dataSource.BXMasRemoteDataSource
@@ -27,7 +28,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DataModule {
+object RemoteDataModule {
 
     @Provides
     @Singleton
@@ -70,9 +71,11 @@ object DataModule {
     @Singleton
     fun provideBXMasDataSource(
         bXMasApiService: BXMasApiService,
+        bXMasLocalDataSource: BXMasLocalDataSource,
     ): BXMasRemoteDataSource =
         BXMasRemoteDataSourceImpl(
-            bXMasApiService
+            bXMasApiService,
+            bXMasLocalDataSource
         )
 
 }

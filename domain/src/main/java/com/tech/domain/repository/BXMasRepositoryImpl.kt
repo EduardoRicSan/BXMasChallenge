@@ -1,22 +1,31 @@
 package com.tech.domain.repository
 
 
-import com.tech.core.network.mapList
 import com.tech.core.remote.NetworkResult
+import com.tech.data.local.dataSource.BXMasLocalDataSource
 import com.tech.data.remote.dataSource.BXMasRemoteDataSource
 import com.tech.domain.model.PhotoUIModel
-import com.tech.domain.model.toPhoto
+import com.tech.domain.model.toUI
 import jakarta.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 
 class BXMasRepositoryImpl @Inject constructor(
-    private val bxMasRemoteDataSource: BXMasRemoteDataSource,
+    private val remote: BXMasRemoteDataSource,
+    private val local: BXMasLocalDataSource
 ) : BXMasRepository {
-    override suspend fun getPhotos(): Flow<NetworkResult<List<PhotoUIModel>>> =
-        bxMasRemoteDataSource.getPhotos().map { it.mapList { it.toPhoto() }
-        }.flowOn(Dispatchers.IO)
 
+    override suspend fun syncPhotos(): Flow<NetworkResult<Unit>> =
+        remote.syncPhotos()
+
+    override suspend fun getPagedPhotos(
+        page: Int,
+        pageSize: Int
+    ): List<PhotoUIModel> =
+        local.getPagedPhotos(
+            limit = pageSize,
+            offset = page * pageSize
+        ).map { it.toUI() }
+
+    override suspend fun getTotalPhotos(): Int =
+        local.getCount()
 }
