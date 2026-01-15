@@ -1,6 +1,5 @@
-package com.tech.bxmaschallenge.presentation.navigation.route
+package com.tech.core.route
 
-import com.tech.domain.model.PhotoUIModel
 import kotlinx.serialization.Serializable
 
 @Serializable

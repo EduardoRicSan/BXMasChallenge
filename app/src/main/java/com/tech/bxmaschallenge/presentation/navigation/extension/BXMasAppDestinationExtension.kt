@@ -2,9 +2,9 @@ package com.tech.bxmaschallenge.presentation.navigation.extension
 
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.toRoute
-import com.tech.bxmaschallenge.presentation.navigation.route.BXMasAppDestination
-import com.tech.bxmaschallenge.presentation.navigation.route.PhotoDetail
-import com.tech.bxmaschallenge.presentation.navigation.route.PhotoList
+import com.tech.core.route.BXMasAppDestination
+import com.tech.core.route.PhotoDetail
+import com.tech.core.route.PhotoList
 import com.tech.design_system.R
 import com.tech.design_system.common.model.UiText
 

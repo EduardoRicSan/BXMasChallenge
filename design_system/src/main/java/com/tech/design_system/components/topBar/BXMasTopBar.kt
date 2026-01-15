@@ -1,5 +1,10 @@
 package com.tech.design_system.components.topBar
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -14,6 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.tech.core.route.BXMasAppDestination
+import com.tech.core.route.PhotoList
 
 
 /**
@@ -30,18 +38,13 @@ import androidx.compose.ui.text.style.TextOverflow
  * @param showSecondActionIcon Whether to display second action icon
  * @param onSecondActionClick Lambda invoked when second action is clicked
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun BXMasTopBar(
     titleText: String,
-    showBackButton: Boolean = false,
+    currentRoute: BXMasAppDestination,
     onBackClick: () -> Unit = {},
-    firstActionIcon: ImageVector? = null,
-    showFirstActionIcon: Boolean = true,
-    onFirstActionClick: () -> Unit = {},
-    secondActionIcon: ImageVector? = null,
-    showSecondActionIcon: Boolean = true,
-    onSecondActionClick: () -> Unit = {},
+    onBackLongPress: () -> Unit = {},
 ) {
     TopAppBar(
         title = {
@@ -54,40 +57,32 @@ fun BXMasTopBar(
             )
         },
         navigationIcon = {
-            if (showBackButton) {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onSurface
+            Box(
+                modifier = Modifier
+                    .padding(12.dp)
+                    .then(
+                        if (currentRoute is PhotoList) {
+                            Modifier.combinedClickable(
+                                onClick = {},
+                                onLongClick = onBackLongPress
+                            )
+                        } else {
+                            Modifier.clickable { onBackClick() }
+                        }
                     )
-                }
-            }
-        },
-        actions = {
-            if (firstActionIcon != null && showFirstActionIcon) {
-                IconButton(onClick = onFirstActionClick) {
-                    Icon(
-                        imageVector = firstActionIcon,
-                        contentDescription = "First action",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
-            if (secondActionIcon != null && showSecondActionIcon) {
-                IconButton(onClick = onSecondActionClick) {
-                    Icon(
-                        imageVector = secondActionIcon,
-                        contentDescription = "Second action",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
-            scrolledContainerColor = MaterialTheme.colorScheme.surface
         ),
-        modifier = Modifier.statusBarsPadding() // para que la barra no tape la status bar
+        modifier = Modifier.statusBarsPadding()
     )
 }
+
+
