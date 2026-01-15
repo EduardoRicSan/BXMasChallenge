@@ -14,11 +14,16 @@ fun BXMasAppDestination.toTopBarTitle(): UiText =
         else -> UiText.StringRes(R.string.title_photo_detail)
     }
 
-fun NavDestination?.toAppDestination(): BXMasAppDestination {
-    return when {
-        this?.hasRoute<PhotoList>() == true -> PhotoList
-        this?.hasRoute<PhotoDetail>() == true -> PhotoDetail
-        else -> PhotoList
-    } as BXMasAppDestination
+fun NavDestination.toAppDestination(): BXMasAppDestination {
+    return when (route?.substringBefore("?")) {
+        PhotoList::class.qualifiedName ->
+            PhotoList
+
+        PhotoDetail::class.qualifiedName ->
+            PhotoDetail(photoId = -1)
+
+        else ->
+            PhotoList
+    }
 }
 

@@ -1,6 +1,7 @@
 package com.tech.bxmaschallenge.presentation.navigation.navHost
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,11 +45,14 @@ fun BXMasNavHost(
     ) { paddingValues, showTopSnackbar, triggerLoader ->
         NavHost(
             navController = navController,
-            startDestination = PhotoList
+            startDestination = PhotoList,
+            modifier = Modifier.padding(paddingValues)
         ) {
 
             composable<PhotoList> {
                 PhotoListScreen(
+                    showTopSnackbar = showTopSnackbar,
+                    showLoader = triggerLoader,
                     onPhotoClick = { photoId ->
                         navController.navigate(
                             PhotoDetail(photoId)
@@ -78,7 +82,7 @@ private fun RouteChangeListener(
 
     LaunchedEffect(backStackEntry) {
         val destination = backStackEntry
-            ?.destination.toAppDestination()
+            ?.destination?.toAppDestination()
 
         viewModel.onIntent(
             MainIntent.RouteChanged(destination)
