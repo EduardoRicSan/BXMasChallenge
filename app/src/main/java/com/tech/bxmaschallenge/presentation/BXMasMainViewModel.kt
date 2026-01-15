@@ -26,7 +26,6 @@ sealed interface MainSideEffect {
     ) : MainSideEffect
 }
 
-@HiltViewModel
 class BXMasMainViewModel() : ViewModel(), ContainerHost<MainState, MainSideEffect> {
 
     override val container = container<MainState, MainSideEffect>(

@@ -14,7 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.tech.design_system.common.model.BXMasSnackbarMessage
-import com.tech.design_system.components.snackbar.SpotiTopSnackbar
+import com.tech.design_system.components.box.BXMasLoaderOverlay
+import com.tech.design_system.components.loader.BXMasLoadingIndicator
+import com.tech.design_system.components.snackbar.BXMasTopSnackbar
 import kotlinx.coroutines.delay
 
 /**
@@ -88,7 +90,7 @@ fun BXMasAppScaffold(
         // ---------------- Overlay Loader ----------------
         if (showLoader) {
             BXMasLoaderOverlay {
-                BXMasLoadingIndicator() // Puedes reemplazar por cualquier loader
+                BXMasLoadingIndicator()
             }
         }
 

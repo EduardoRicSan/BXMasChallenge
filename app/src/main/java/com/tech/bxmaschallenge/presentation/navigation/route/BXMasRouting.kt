@@ -11,5 +11,5 @@ data object PhotoList : BXMasAppDestination
 
 @Serializable
 data class PhotoDetail(
-    val photo: PhotoUIModel,
+    val photoId: Int,
 ) : BXMasAppDestination

@@ -49,9 +49,9 @@ fun BXMasNavHost(
 
             composable<PhotoList> {
                 PhotoListScreen(
-                    onPhotoClick = { photo ->
+                    onPhotoClick = { photoId ->
                         navController.navigate(
-                            PhotoDetail(photo)
+                            PhotoDetail(photoId)
                         )
                     }
                 )
@@ -60,7 +60,7 @@ fun BXMasNavHost(
             composable<PhotoDetail> { backStackEntry ->
                 val route = backStackEntry.toRoute<PhotoDetail>()
                 PhotoDetailScreen(
-                    photo = route.photo
+                    photoId = route.photoId
                 )
             }
         }
