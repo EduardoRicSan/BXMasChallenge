@@ -8,15 +8,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.tech.bxmaschallenge.presentation.BXMasMainViewModel
 import com.tech.bxmaschallenge.presentation.MainIntent
-import com.tech.bxmaschallenge.presentation.navigation.extension.toAppDestination
 import com.tech.bxmaschallenge.presentation.navigation.route.PhotoDetail
 import com.tech.bxmaschallenge.presentation.navigation.route.PhotoList
 import com.tech.bxmaschallenge.presentation.ui.photoDetail.PhotoDetailScreen
@@ -50,6 +47,11 @@ fun BXMasNavHost(
         ) {
 
             composable<PhotoList> {
+                LaunchedEffect(Unit) {
+                    viewModel.onIntent(
+                        MainIntent.RouteChanged(PhotoList)
+                    )
+                }
                 PhotoListScreen(
                     showTopSnackbar = showTopSnackbar,
                     showLoader = triggerLoader,
@@ -63,6 +65,11 @@ fun BXMasNavHost(
 
             composable<PhotoDetail> { backStackEntry ->
                 val route = backStackEntry.toRoute<PhotoDetail>()
+                LaunchedEffect(Unit) {
+                    viewModel.onIntent(
+                        MainIntent.RouteChanged(PhotoDetail(route.photoId))
+                    )
+                }
                 PhotoDetailScreen(
                     photoId = route.photoId
                 )
@@ -70,22 +77,4 @@ fun BXMasNavHost(
         }
     }
 
-    RouteChangeListener(navController, viewModel)
-}
-
-@Composable
-private fun RouteChangeListener(
-    navController: NavHostController,
-    viewModel: BXMasMainViewModel
-) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
-
-    LaunchedEffect(backStackEntry) {
-        val destination = backStackEntry
-            ?.destination?.toAppDestination()
-
-        viewModel.onIntent(
-            MainIntent.RouteChanged(destination)
-        )
-    }
 }

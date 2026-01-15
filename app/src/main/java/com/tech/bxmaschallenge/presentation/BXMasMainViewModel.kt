@@ -1,11 +1,11 @@
 package com.tech.bxmaschallenge.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.tech.bxmaschallenge.presentation.navigation.extension.toTopBarTitle
 import com.tech.bxmaschallenge.presentation.navigation.route.BXMasAppDestination
 import com.tech.bxmaschallenge.presentation.navigation.route.PhotoList
 import com.tech.design_system.common.model.UiText
-import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
 
@@ -39,6 +39,7 @@ class BXMasMainViewModel() : ViewModel(), ContainerHost<MainState, MainSideEffec
                 val safeRoute = intent.route ?: PhotoList
 
                 reduce {
+                    Log.d("NAV", "Route changed to: $safeRoute")
                     state.copy(
                         currentRoute = safeRoute,
                         topBarTitle = safeRoute.toTopBarTitle(),

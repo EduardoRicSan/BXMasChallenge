@@ -3,16 +3,24 @@ package com.tech.bxmaschallenge.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import com.tech.core.remote.NetworkResult
 import com.tech.domain.model.PhotoUIModel
+import com.tech.domain.useCase.EnsurePhotosSyncedUseCase
 import com.tech.domain.useCase.GetPagedPhotosUseCase
-import com.tech.domain.useCase.SyncPhotosUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
+enum class PhotoLoadPhase {
+    IDLE,
+    SYNCING,
+    LOADING_PAGE
+}
+
 data class PhotoState(
-    val isLoading: Boolean = false,
-    val isPaging: Boolean = false,
+    val phase: PhotoLoadPhase = PhotoLoadPhase.IDLE,
     val page: Int = 0,
     val users: List<PhotoUIModel> = emptyList(),
     val endReached: Boolean = false
@@ -25,62 +33,100 @@ sealed class PhotoSideEffect {
 
 @HiltViewModel
 class PhotoViewModel @Inject constructor(
-    private val syncPhotosUseCase: SyncPhotosUseCase,
+    private val ensurePhotosSyncedUseCase: EnsurePhotosSyncedUseCase,
     private val getPagedPhotosUseCase: GetPagedPhotosUseCase
-) : ViewModel(), ContainerHost<PhotoState, PhotoSideEffect> {
+) : ViewModel(),
+    ContainerHost<PhotoState, PhotoSideEffect> {
 
     override val container =
         container<PhotoState, PhotoSideEffect>(PhotoState())
 
-    private val pageSize = 20
+    private val pageSize = 50
 
-    fun syncPhotos() = intent {
-        syncPhotosUseCase().collect { result ->
+    /* ------------------------------------ */
+    /* Sync inicial + primera página         */
+    /* ------------------------------------ */
+
+    fun ensurePhotosSynced() = intent {
+        if (state.phase != PhotoLoadPhase.IDLE) return@intent
+
+        reduce {
+            state.copy(
+                phase = PhotoLoadPhase.SYNCING,
+                page = 0,
+                endReached = false,
+                users = emptyList()
+            )
+        }
+
+        ensurePhotosSyncedUseCase().collect { result ->
             when (result) {
-                is NetworkResult.Loading -> reduce {
-                    state.copy(isLoading = true)
-                }
-
-                is NetworkResult.Success -> {
-                    reduce { state.copy(isLoading = false) }
-                    loadNextPage(reset = true)
-                }
+                is NetworkResult.Loading -> Unit
 
                 is NetworkResult.Error -> {
-                    reduce { state.copy(isLoading = false) }
+                    reduce { state.copy(phase = PhotoLoadPhase.IDLE) }
                     postSideEffect(
                         PhotoSideEffect.ShowError(result.message)
                     )
+                }
+
+                is NetworkResult.Success -> {
+                    // 👉 Primera página DENTRO del intent
+                    reduce { state.copy(phase = PhotoLoadPhase.LOADING_PAGE) }
+
+                    delay(600) // simulación UX visible
+
+                    val items = getPagedPhotosUseCase(
+                        page = 0,
+                        pageSize = pageSize
+                    )
+
+                    reduce {
+                        state.copy(
+                            users = items,
+                            page = 1,
+                            endReached = items.size < pageSize,
+                            phase = PhotoLoadPhase.IDLE
+                        )
+                    }
                 }
             }
         }
     }
 
-    fun loadNextPage(reset: Boolean = false) = intent {
-        if (state.isPaging || state.endReached) return@intent
+    /* ------------------------------------ */
+    /* Paginación                            */
+    /* ------------------------------------ */
+
+    fun loadNextPage() = intent {
+        if (
+            state.phase != PhotoLoadPhase.IDLE ||
+            state.endReached
+        ) return@intent
 
         reduce {
-            state.copy(
-                isPaging = true,
-                page = if (reset) 0 else state.page
-            )
+            state.copy(phase = PhotoLoadPhase.LOADING_PAGE)
         }
 
-        val pageToLoad = if (reset) 0 else state.page
+        delay(400)
+
+        val currentPage = state.page
 
         val items = getPagedPhotosUseCase(
-            page = pageToLoad,
+            page = currentPage,
             pageSize = pageSize
         )
 
         reduce {
             state.copy(
-                users = if (reset) items else state.users + items,
-                page = pageToLoad + 1,
-                isPaging = false,
-                endReached = items.size < pageSize
+                users = state.users + items,
+                page = currentPage + 1,
+                endReached = items.size < pageSize,
+                phase = PhotoLoadPhase.IDLE
             )
         }
     }
 }
+
+
 

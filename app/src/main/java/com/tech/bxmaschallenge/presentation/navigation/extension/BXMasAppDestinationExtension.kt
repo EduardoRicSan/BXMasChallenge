@@ -1,7 +1,7 @@
 package com.tech.bxmaschallenge.presentation.navigation.extension
 
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.toRoute
 import com.tech.bxmaschallenge.presentation.navigation.route.BXMasAppDestination
 import com.tech.bxmaschallenge.presentation.navigation.route.PhotoDetail
 import com.tech.bxmaschallenge.presentation.navigation.route.PhotoList
@@ -14,16 +14,18 @@ fun BXMasAppDestination.toTopBarTitle(): UiText =
         else -> UiText.StringRes(R.string.title_photo_detail)
     }
 
-fun NavDestination.toAppDestination(): BXMasAppDestination {
-    return when (route?.substringBefore("?")) {
-        PhotoList::class.qualifiedName ->
-            PhotoList
-
-        PhotoDetail::class.qualifiedName ->
-            PhotoDetail(photoId = -1)
-
-        else ->
-            PhotoList
+fun NavBackStackEntry.toAppDestination(): BXMasAppDestination? {
+    return when {
+        toRouteOrNull<PhotoList>() != null -> PhotoList
+        toRouteOrNull<PhotoDetail>() != null -> PhotoDetail(photoId = -1)
+        else -> null
     }
 }
+
+inline fun <reified T : Any> NavBackStackEntry.toRouteOrNull(): T? {
+    return runCatching {
+        toRoute<T>()
+    }.getOrNull()
+}
+
 

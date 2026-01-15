@@ -1,18 +1,23 @@
 package com.tech.bxmaschallenge.presentation.ui.photoList
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.tech.bxmaschallenge.presentation.viewmodel.PhotoLoadPhase
 import com.tech.bxmaschallenge.presentation.viewmodel.PhotoSideEffect
 import com.tech.bxmaschallenge.presentation.viewmodel.PhotoViewModel
 import com.tech.design_system.common.model.BXMasSnackbarMessage
@@ -30,12 +35,16 @@ fun PhotoListScreen(
     val state by viewModel.collectAsState()
     val listState = rememberLazyListState()
 
-    // 🔹 Carga inicial (sync remoto → local)
+    /* ------------------------------------ */
+    /* Initial sync                          */
+    /* ------------------------------------ */
     LaunchedEffect(Unit) {
-        viewModel.syncPhotos()
+        viewModel.ensurePhotosSynced()
     }
 
-    // 🔹 Side effects
+    /* ------------------------------------ */
+    /* Side effects                          */
+    /* ------------------------------------ */
     LaunchedEffect(Unit) {
         viewModel.container.sideEffectFlow.collect { effect ->
             when (effect) {
@@ -48,41 +57,69 @@ fun PhotoListScreen(
         }
     }
 
-    // 🔹 Scroll pagination
+    /* ------------------------------------ */
+    /* Pagination trigger                    */
+    /* ------------------------------------ */
     LaunchedEffect(listState) {
         snapshotFlow {
             listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
         }.collect { lastVisibleIndex ->
-            if (
+            val shouldLoadNext =
                 lastVisibleIndex == state.users.lastIndex &&
-                !state.isPaging &&
-                !state.endReached
-            ) {
+                        state.phase == PhotoLoadPhase.IDLE &&
+                        !state.endReached
+
+            if (shouldLoadNext) {
                 viewModel.loadNextPage()
             }
         }
     }
 
-    showLoader(state.isLoading)
+    /* ------------------------------------ */
+    /* Global loader (sync)                  */
+    /* ------------------------------------ */
+    showLoader(state.phase == PhotoLoadPhase.SYNCING)
 
+    /* ------------------------------------ */
+    /* List                                  */
+    /* ------------------------------------ */
     LazyColumn(
         state = listState
     ) {
-        items(state.users) { photo ->
+        items(
+            items = state.users,
+            key = { it.id ?: it.hashCode() } // 👈 importante para performance
+        ) { photo ->
             BXMasBodyText(
                 photo.title.orEmpty(),
-                modifier = Modifier.clickable {
-                    onPhotoClick(photo.id ?: 0)
-                }
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onPhotoClick(photo.id ?: 0)
+                    }
+                    .padding(16.dp)
             )
         }
 
-        item {
-            if (state.isPaging) {
-                CircularProgressIndicator(
-                    modifier = Modifier.padding(16.dp)
-                )
+        /* ------------------------------------ */
+        /* Paging footer loader                 */
+        /* ------------------------------------ */
+        if (state.phase == PhotoLoadPhase.LOADING_PAGE &&
+            state.users.isNotEmpty()
+        ) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
 }
+
