@@ -6,4 +6,12 @@
     <string name="message_alert_dialog_exit">¿Deseas salir de la aplicación?</string>
     <string name="confirm_alert_dialog_exit">Sí</string>
     <string name="dismiss_alert_dialog_exit">Cancelar</string>
+    <string name="error_no_photo_found">Foto no encontrada</string>
+    <string name="about_dev_name">Eduardo Rico</string>
+    <string name="about_dev_role">Android Software Engineer</string>
+    <string name="about_dev_about">Apasionado por crear experiencias móviles intuitivas, escalables y con un gran diseño. 🚀</string>
+    <string name="about_favorite_book">Libro favorito: "La teoría sintérgica" - Jacobo Grinberg</string>
+    <string name="about_favorite_character">Personaje favorito: "Goku"</string>
+    <string name="about_ninja_turtle">Tortuga Ninja: "Michelangelo"</string>
+
 </resources>

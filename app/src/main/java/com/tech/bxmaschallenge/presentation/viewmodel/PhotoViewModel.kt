@@ -6,9 +6,7 @@ import com.tech.domain.model.PhotoUIModel
 import com.tech.domain.useCase.EnsurePhotosSyncedUseCase
 import com.tech.domain.useCase.GetPagedPhotosUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject

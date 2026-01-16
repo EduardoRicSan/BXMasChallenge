@@ -295,6 +295,7 @@ fun BXMasLabelText(
     textDecoration: TextDecoration? = null,
     style: TextStyle = MaterialTheme.typography.labelMedium,
     maxLines: Int = 1,
+    overflow: TextOverflow = TextOverflow.Clip,
     onClick: (() -> Unit)? = null
 ) {
     Text(

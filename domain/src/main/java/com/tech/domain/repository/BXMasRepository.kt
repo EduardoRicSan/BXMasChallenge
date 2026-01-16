@@ -14,4 +14,6 @@ interface BXMasRepository {
     ): List<PhotoUIModel>
 
     suspend fun getTotalPhotos(): Int
+
+    fun getPhotoById(id: Int): Flow<PhotoUIModel?>
 }

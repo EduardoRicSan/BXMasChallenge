@@ -3,6 +3,7 @@ package com.tech.data.local.dataSource
 import com.tech.data.local.dao.BXMasDao
 import com.tech.data.local.entity.PhotoEntity
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
 class BXMasLocalDataSourceImpl @Inject constructor(
     private val photoDao: BXMasDao
@@ -24,4 +25,7 @@ class BXMasLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getCount(): Int =
         photoDao.count()
+
+    override fun getPhotoById(photoId: Int): Flow<PhotoEntity?> =
+        photoDao.getPhotoById(photoId)
 }

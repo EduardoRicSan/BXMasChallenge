@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -82,23 +83,26 @@ fun BXMasCircularImage(
     source: BXMasImageSource,
     size: Dp = 60.dp,
     contentDescription: String? = null,
-    borderWidth: Dp? = null,
-    borderColor: Color = Color.Unspecified,
+    borderWidth: Dp? = 1.dp,
+    borderColor: Color = Color.LightGray ,
+    shape: Shape = CircleShape,
     onClick: (() -> Unit)? = null
 ) {
-    val baseModifier = Modifier
+    val modifier = Modifier
         .size(size)
-        .clip(CircleShape)
+        .clip(shape)
         .then(
             if (borderWidth != null && borderColor != Color.Unspecified)
-                Modifier.border(borderWidth, borderColor, CircleShape)
+                Modifier.border(borderWidth, borderColor, shape)
             else Modifier
+        )
+        .then(
+            if (onClick != null) Modifier.clickable { onClick() } else Modifier
         )
 
     BXMasImage(
         source = source,
-        modifier = baseModifier,
-        contentDescription = contentDescription,
-        onClick = onClick
+        modifier = modifier,
+        contentDescription = contentDescription
     )
 }

@@ -1,6 +1,5 @@
 package com.tech.bxmaschallenge.presentation.ui.photoList
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,10 +20,10 @@ import com.tech.bxmaschallenge.presentation.viewmodel.PhotoLoadPhase
 import com.tech.bxmaschallenge.presentation.viewmodel.PhotoSideEffect
 import com.tech.bxmaschallenge.presentation.viewmodel.PhotoViewModel
 import com.tech.design_system.common.model.BXMasSnackbarMessage
-import com.tech.design_system.components.text.BXMasBodyText
 import org.orbitmvi.orbit.compose.collectAsState
 
 
+// Composable that displays a photo list item  title and circular image
 @Composable
 fun PhotoListScreen(
     onPhotoClick: (Int) -> Unit,
@@ -90,14 +89,9 @@ fun PhotoListScreen(
             items = state.users,
             key = { it.id ?: it.hashCode() } // 👈 importante para performance
         ) { photo ->
-            BXMasBodyText(
-                photo.title.orEmpty(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onPhotoClick(photo.id ?: 0)
-                    }
-                    .padding(16.dp)
+            PhotoItemComposable(
+                photo = photo,
+                onPhotoClick = onPhotoClick
             )
         }
 

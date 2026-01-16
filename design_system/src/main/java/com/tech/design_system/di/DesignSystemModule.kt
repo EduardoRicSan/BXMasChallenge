@@ -1,6 +1,7 @@
 package com.tech.design_system.di
 
 import android.content.Context
+import android.util.Log
 import coil3.ImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.svg.SvgDecoder
@@ -9,6 +10,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import javax.inject.Singleton
@@ -20,11 +22,28 @@ object DesignSystemModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
-        val logging = HttpLoggingInterceptor().apply {
+        val logging = HttpLoggingInterceptor { message ->
+            Log.d("OkHttp", message) // Logs de cada request/response
+        }.apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
+
+        // Interceptor extra para log detallado
+        val debugInterceptor = Interceptor { chain ->
+            val request = chain.request()
+            Log.d("OkHttpDebug", "Request URL: ${request.url}")
+            Log.d("OkHttpDebug", "Request headers: ${request.headers}")
+
+            val response = chain.proceed(request)
+
+            Log.d("OkHttpDebug", "Response code: ${response.code}")
+            Log.d("OkHttpDebug", "Response message: ${response.message}")
+            response
+        }
+
         return OkHttpClient.Builder()
             .addInterceptor(logging)
+            .addInterceptor(debugInterceptor)
             .build()
     }
 

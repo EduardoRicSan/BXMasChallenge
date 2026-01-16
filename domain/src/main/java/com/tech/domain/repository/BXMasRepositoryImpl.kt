@@ -8,6 +8,7 @@ import com.tech.domain.model.PhotoUIModel
 import com.tech.domain.model.toUI
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class BXMasRepositoryImpl @Inject constructor(
     private val remote: BXMasRemoteDataSource,
@@ -28,4 +29,7 @@ class BXMasRepositoryImpl @Inject constructor(
 
     override suspend fun getTotalPhotos(): Int =
         local.getCount()
+
+    override fun getPhotoById(id: Int): Flow<PhotoUIModel?> =
+        local.getPhotoById(id).map { it?.toUI() }
 }

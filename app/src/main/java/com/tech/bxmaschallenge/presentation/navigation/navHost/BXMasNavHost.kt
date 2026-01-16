@@ -32,6 +32,7 @@ import com.tech.design_system.components.dialog.BXMasAlertDialog
 import com.tech.design_system.components.scafold.BXMasAppScaffold
 import com.tech.design_system.components.topBar.BXMasTopBar
 
+// Main Composable hosting the app's navigation and UI scaffolding
 @Composable
 fun BXMasNavHost(
     modifier: Modifier = Modifier,
@@ -40,10 +41,8 @@ fun BXMasNavHost(
     val navController = rememberNavController()
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
 
-    // 🔹 Estado local para visibilidad del dialog
     val showExitDialog = remember { mutableStateOf(false) }
 
-    // 🔹 SideEffects
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.container.sideEffectFlow.collect { effect ->
